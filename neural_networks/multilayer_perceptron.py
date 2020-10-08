@@ -2,7 +2,25 @@ from .utils.functions import *
 
 
 class MultiLayerPerceptron(object):
+    """
+        Examples
+        --------
+        >>> from neural_networks.multilayer_perceptron import MultiLayerPerceptron
 
+        Load train and valid dataset
+
+        >>> mlp = MultiLayerPerceptron()
+        >>> X = np.array([[0], [1]])
+        >>> y = np.array([[0], [1]])
+
+        Perform a multi-layer perceptron estimate on the data:
+
+        >>> mlp.fit(X,y)
+
+        Predict use trained multi-layer perceptron
+
+        >>> y_pred = mlp.predict(np.array([[0]]))
+    """
     def __init__(self, hidden_layer_sizes=(100,), alpha=0.01, learning_rate="constant", learning_rate_init=0.001, max_iter=200, random_state=42, tol=1e-4, verbose=False):
         self.hidden_layer_sizes = hidden_layer_sizes
         self.learning_rate = learning_rate
@@ -220,7 +238,7 @@ class MultiLayerPerceptron(object):
             activations.append(np.empty((X.shape[0], layer_units[i + 1])))
 
         # forward propagate
-            self._forward_pass(activations)
+        self._forward_pass(activations)
         y_pred = activations[-1]
 
         return y_pred
