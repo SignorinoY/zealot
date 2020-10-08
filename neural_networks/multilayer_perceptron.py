@@ -1,10 +1,9 @@
-from neural_networks.utils.functions import *
+from .utils.functions import *
+
 
 class MultiLayerPerceptron(object):
 
-    def __init__(self, hidden_layer_sizes=(100,), alpha=0.01, learning_rate="constant",
-                 learning_rate_init=0.001, max_iter=200, random_state=42,
-                 tol=1e-4, verbose=False):
+    def __init__(self, hidden_layer_sizes=(100,), alpha=0.01, learning_rate="constant", learning_rate_init=0.001, max_iter=200, random_state=42, tol=1e-4, verbose=False):
         self.hidden_layer_sizes = hidden_layer_sizes
         self.learning_rate = learning_rate
         self.learning_rate_init = learning_rate_init
@@ -15,12 +14,10 @@ class MultiLayerPerceptron(object):
         self.verbose = verbose
 
         self.loss_curve_ = []
-
         self.n_outputs_ = None
 
     def _forward_pass(self, activations):
-        """Perform a forward pass on the network by computing the values
-        of the neurons in the hidden layers and the output layer.
+        """Perform a forward pass on the network by computing the values of the neurons in the hidden layers and the output layer.
 
         Parameters
         ----------
@@ -46,19 +43,13 @@ class MultiLayerPerceptron(object):
              The ith element of the list holds the values of the ith layer.
 
         deltas : list, length = n_layers - 1
-            The ith element of the list holds the difference between the
-            activations of the i + 1 layer and the backpropagated error.
-            More specifically, deltas are gradients of loss with respect to z
-            in each layer, where z = wx + b is the value of a particular layer
-            before passing through the activation function
+            The ith element of the list holds the difference between the activations of the i + 1 layer and the backpropagated error. More specifically, deltas are gradients of loss with respect to z in each layer, where z = wx + b is the value of a particular layer before passing through the activation function
 
         coef_grads : list, length = n_layers - 1
-            The ith element contains the amount of change used to update the
-            coefficient parameters of the ith layer in an iteration.
+            The ith element contains the amount of change used to update the coefficient parameters of the ith layer in an iteration.
 
         intercept_grads : list, length = n_layers - 1
-            The ith element contains the amount of change used to update the
-            intercept parameters of the ith layer in an iteration.
+            The ith element contains the amount of change used to update the intercept parameters of the ith layer in an iteration.
 
         Returns
         -------
@@ -69,6 +60,7 @@ class MultiLayerPerceptron(object):
         deltas[-1] = activations[-1] * (1 - activations[-1]) * (activations[-1] - y)
         for i in range(self.n_layers_ - 2, 0, -1):
             deltas[i - 1] = activations[-1] * (1 - activations[-1]) * np.dot(deltas[i], self.coefs_[i].T)
+
         # Compute the coef gradients
         for i in range(self.n_layers_ - 1):
             coef_grads[i] = np.dot(activations[i].reshape(-1, 1), deltas[i].reshape(1, -1))
@@ -89,8 +81,6 @@ class MultiLayerPerceptron(object):
         return coef_init, intercept_init
 
     def _initialize(self, layer_units):
-        # set all attributes, allocate weights etc for first call
-
         # Initialize parameters
         self.n_iter_ = 0
         self.best_loss_ = np.inf
@@ -116,14 +106,12 @@ class MultiLayerPerceptron(object):
             The input data.
 
         y : ndarray, shape (n_samples,) or (n_samples, n_outputs)
-            The target values (class labels in classification, real numbers in
-            regression).
+            The target values (class labels in classification, real numbers in regression).
 
         Returns
         -------
         self : returns a trained simple-layer feedforward neural networks.
         """
-
         # Make sure self.hidden_layer_sizes is a list
         hidden_layer_sizes = self.hidden_layer_sizes
         if not hasattr(hidden_layer_sizes, "__iter__"):
@@ -147,8 +135,7 @@ class MultiLayerPerceptron(object):
         n_samples, n_features = X.shape
         self.n_outputs_ = y.shape[1]
 
-        layer_units = ([n_features] + hidden_layer_sizes +
-                       [self.n_outputs_])
+        layer_units = ([n_features] + hidden_layer_sizes + [self.n_outputs_])
 
         # First time training the model
         self._initialize(layer_units)
@@ -156,8 +143,7 @@ class MultiLayerPerceptron(object):
         # Initialize lists
         activations = [None] * len(layer_units)
         deltas = [None] * (len(activations) - 1)
-        coef_grads = [np.empty((n_fan_in_, n_fan_out_)) for n_fan_in_, n_fan_out_ in
-                      zip(layer_units[:-1], layer_units[1:])]
+        coef_grads = [np.empty((n_fan_in_, n_fan_out_)) for n_fan_in_, n_fan_out_ in zip(layer_units[:-1], layer_units[1:])]
         intercept_grads = [np.empty(n_fan_out_) for n_fan_out_ in layer_units[1:]]
 
         # Standard BP Algorithm
@@ -176,7 +162,6 @@ class MultiLayerPerceptron(object):
             accumulated_loss = 0.0
 
             for k in range(n_samples):
-
                 # compute the hidden layers and output layer
                 activations[0] = X[k]
                 activations = self._forward_pass(activations)
@@ -185,18 +170,18 @@ class MultiLayerPerceptron(object):
                 accumulated_loss += ((y[k] - activations[-1]) ** 2).mean() / 2
 
                 # compute the gradient of weights
-                coef_grads, intercept_grads = self._backprop(X[k], y[k], activations, deltas, coef_grads,
-                                                             intercept_grads)
-
+                coef_grads, intercept_grads = self._backprop(X[k], y[k], activations, deltas, coef_grads, intercept_grads)
+                
                 # update weights
                 for i in range(self.n_layers_ - 1):
                     self.coefs_[i] -= coef_grads[i]
                     self.intercepts_[i] -= intercept_grads[i]
 
             self.n_iter_ += 1
-            loss_ = accumulated_loss / n_samples
 
+            loss_ = accumulated_loss / n_samples
             self.loss_curve_.append(loss_)
+
             if self.verbose:
                 print("Iteration %d, loss = %.8f" % (self.n_iter_, loss_))
 
