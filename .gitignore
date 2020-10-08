@@ -136,6 +136,12 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
+# Pytorch downloaded datasets
+data/*
+
+# Pytorch saved models
+*.tar
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
