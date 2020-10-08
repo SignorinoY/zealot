@@ -192,17 +192,35 @@ class MultiLayerPerceptron(object):
                 break
 
     def predict(self, X):
+        """Predict using the trained model
 
-        n_samples = X.shape[0]
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The input data.
+
+        Returns
+        -------
+        y_pred : ndarray of shape (n_samples,) or (n_samples, n_outputs)
+            The decision function of the samples for each class in the model.
+        """
+        hidden_layer_sizes = self.hidden_layer_sizes
+
+        # Make sure self.hidden_layer_sizes is a list
+        if not hasattr(hidden_layer_sizes, "__iter__"):
+            hidden_layer_sizes = [hidden_layer_sizes]
+        hidden_layer_sizes = list(hidden_layer_sizes)
+
+        layer_units = [X.shape[1]] + hidden_layer_sizes + [self.n_outputs_]
 
         # Initialize layers
-        activations = [None] * 3
-        y_pred = []
+        activations = [X]
+
+        for i in range(self.n_layers_ - 1):
+            activations.append(np.empty((X.shape[0], layer_units[i + 1])))
 
         # forward propagate
-        for k in range(n_samples):
-            activations[0] = X[k]
             self._forward_pass(activations)
-            y_pred.append(activations[-1])
+        y_pred = activations[-1]
 
         return y_pred
