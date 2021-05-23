@@ -1,27 +1,29 @@
-from tree.decision_tree_classifier import DecisionTreeClassifier
+from sklearn import datasets
 
-import numpy as np
+from tree.classes import DecisionTreeClassifier, DecisionTreeRegressor
 
-X = np.array([
-    [0, 0, 0, 0],
-    [0, 0, 0, 1],
-    [0, 1, 0, 1],
-    [0, 1, 1, 0],
-    [0, 0, 0, 0],
-    [1, 0, 0, 0],
-    [1, 0, 0, 1],
-    [1, 1, 1, 1],
-    [1, 0, 1, 2],
-    [1, 0, 1, 2],
-    [2, 0, 1, 2],
-    [2, 0, 1, 1],
-    [2, 1, 0, 1],
-    [2, 1, 0, 2],
-    [2, 0, 0, 0],
-])
-y = np.array([0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0])
+# Classification
 
-clf = DecisionTreeClassifier()
+iris = datasets.load_iris()
+X = iris.data
+y = iris.target
+
+clf = DecisionTreeClassifier(criterion="gini")
+
 clf.fit(X, y)
+
 print(clf.tree_)
 print(clf.predict(X))
+
+# Regression
+
+boston = datasets.load_boston()
+X = boston.data
+y = boston.target
+
+reg = DecisionTreeRegressor()
+
+reg.fit(X, y)
+
+print(reg.tree_)
+print(reg.predict(X))

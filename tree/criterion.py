@@ -112,8 +112,10 @@ class Gini(ClassificationCriterion):
         gini = 1.0
 
         for c in range(self.n_classes):
-            p = self.sum_total[c] / self.n_total
-            gini -= p * p
+            count = self.sum_total[c]
+            if count > 0.0:
+                p = count / self.n_total
+                gini -= p * p
 
         return gini
 
@@ -123,8 +125,15 @@ class Gini(ClassificationCriterion):
         gini_right = 1.0
 
         for c in range(self.n_classes):
-            gini_left -= (self.sum_left[c] / self.n_left) ** 2
-            gini_right -= (self.sum_right[c] / self.n_right) ** 2
+            count = self.sum_left[c]
+            if count > 0.0:
+                p = count / self.n_left
+                gini_left -= p * p
+
+            count = self.sum_right[c]
+            if count > 0.0:
+                p = count / self.n_right
+                gini_right -= p * p
 
         return gini_left, gini_right
 

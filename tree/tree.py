@@ -69,7 +69,7 @@ class TreeBuilder(object):
         while len(stack):
             selected_idxs, parent, depth, is_left, impurity = stack.pop()
 
-            n_samples = selected_idxs.size
+            n_samples = sum(selected_idxs)
 
             is_leaf = (
                 n_samples < self.min_samples_split or
@@ -84,7 +84,7 @@ class TreeBuilder(object):
                 for feature_idx in range(n_features):
                     feature = X[:, feature_idx]
                     is_integer = issubclass(feature.dtype.type, np.integer)
-                    values = np.unique(feature)
+                    values = np.unique(feature[selected_idxs])
                     for threshold in values:
                         split_idxs = (feature == threshold) if is_integer \
                             else (feature <= threshold)
@@ -106,7 +106,7 @@ class TreeBuilder(object):
             feature = X[:, selected_feature]
             is_integer = issubclass(feature.dtype.type, np.integer)
             split_idxs = (feature == selected_threshold) if is_integer \
-                else(feature <= threshold)
+                else(feature <= selected_threshold)
             y_left = y[selected_idxs & split_idxs]
             y_right = y[selected_idxs & ~split_idxs]
             self.criterion.update(y_left, y_right)
