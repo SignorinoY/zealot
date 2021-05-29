@@ -3,18 +3,25 @@ import numpy as np
 
 class Node(object):
 
-    def __init__(self, n_samples, impurity, feature=None, threshold=None, children_left=None, children_right=None, label=None):
-        # 所以节点均具有的属性
+    def __init__(
+        self,
+        n_samples,
+        impurity,
+        feature=None,
+        threshold=None,
+        children_left=None,
+        children_right=None,
+        label=None
+    ):
+        # properties of all nodes
         self.n_samples = n_samples
         self.impurity = impurity
-
-        # 切割节点具有的属性
+        # properties of inner nodes
         self.feature = feature
         self.threshold = threshold
         self.children_left = children_left
         self.children_right = children_right
-
-        # 叶子节点具有的属性
+        # properties of leaf nodes
         self.label = label
 
 

@@ -3,9 +3,8 @@ import numpy as np
 
 class Bagging(object):
 
-    def __init__(self, base_estimator, objective, n_estimators=10, max_samples=0.7):
+    def __init__(self, base_estimator, n_estimators=10, max_samples=0.7):
         self.base_estimator = base_estimator
-        self.objective = objective
         self.n_estimators = n_estimators
         self.max_samples = max_samples
 
@@ -28,18 +27,18 @@ class Bagging(object):
         ys_hat = np.zeros((self.n_estimators, n_samples))
         for i, estimator in enumerate(self.estimators):
             ys_hat[i] = estimator.predict(X)
-        if self.base_estimator.objective[0] == "classification":
+        if self.base_estimator.objective == "classification":
             ys_hat = ys_hat.astype(int)
             y_hat = np.apply_along_axis(
                 lambda x: np.bincount(x).argmax(), axis=0, arr=ys_hat)
         else:
-            y_hat = np.mean(ys_hat, axis=1)
+            y_hat = np.mean(ys_hat, axis=0)
         return y_hat
 
     def score(self, X, y):
         y_hat = self.predict(X)
-        if self.base_estimator.objective[0] == "classification":
+        if self.base_estimator.objective == "classification":
             score = np.mean(y != y_hat)
         else:
-            score = np.mean((y - y_hat) ** 2)
+            score = np.mean((y - y_hat) ** 2) / np.var(y)
         return score

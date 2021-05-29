@@ -19,13 +19,34 @@ CRITERIA_CLF = {
 CRITERIA_REG = {
     "mse": MSE
 }
+
 # =============================================================================
 # Base decision tree
 # =============================================================================
 
 
 class BaseDecisionTree(object):
-    """Base class for decision tree."""
+    """Base class for decision tree.
+
+    Parameters
+    ----------
+    objective : {"classification", "regression"}
+        The objective for build tree.
+    criterion : {"gini", "entropy", "mse"}
+        The function to measure the quality of a split.
+    max_depth : int
+        The maximum depth of the tree.
+    min_samples_split : int
+        The minimum number of samples required to split an internal node.
+    min_samples_leaf : int
+        The minimum number of samples required to be at a leaf node.
+    min_impurity_decrease : float
+        A node will be split if this split induces a decrease of the impurity
+        greater than or equal to this value.
+    min_impurity_split : float
+        Threshold for early stopping in tree growth.
+
+    """
 
     def __init__(
         self,
@@ -37,7 +58,7 @@ class BaseDecisionTree(object):
         min_impurity_decrease,
         min_impurity_split
     ):
-        self.objective = objective,
+        self.objective = objective
         self.criterion = criterion
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
@@ -46,10 +67,24 @@ class BaseDecisionTree(object):
         self.min_impurity_split = min_impurity_split
 
     def fit(self, X, y):
+        """Build a decision tree classifier or regressor from the training set (X, y).
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The training input samples.
+        y : array-like of shape (n_samples, )
+            The training target classes, or the target values.
+
+        Returns
+        -------
+        y: array-like of shape (n_samples, )
+            The predicted classes, or the predict values.
+        """
         # Determine output settings
         n_samples, self.n_features = X.shape
         # Setup default parameters
-        if self.objective[0] == "classification":
+        if self.objective == "classification":
             criterion = CRITERIA_CLF[self.criterion]()
         else:
             criterion = CRITERIA_REG[self.criterion]()
@@ -73,7 +108,19 @@ class BaseDecisionTree(object):
         return self
 
     def predict(self, X):
-        # check isfitted
+        """Predict class or regression value for X.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input samples.
+
+        Returns
+        -------
+        y: array-like of shape (n_samples, )
+            The predicted classes, or the predict values.
+        """
+        # !TODO check the model is fitted
         n_samples = X.shape[0]
         y_pred = []
         for i in range(n_samples):
@@ -81,6 +128,7 @@ class BaseDecisionTree(object):
             while node.label is None:
                 selected_feature = node.feature
                 feature = X[i, selected_feature]
+                # judge whether is discrete or continuous variable
                 is_integer = issubclass(feature.dtype.type, np.integer)
                 is_left = (feature == node.threshold) if is_integer else(
                     feature <= node.threshold)
@@ -89,7 +137,29 @@ class BaseDecisionTree(object):
         return np.array(y_pred)
 
     def score(self, X, y):
-        pass
+        """Build a decision tree classifier from the training set (X, y).
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The training input samples.
+        y : array-like of shape (n_samples, )
+            The training target classes, or the target values.
+
+        Returns
+        -------
+        y: array-like of shape (n_samples, )
+            The predicted classes, or the predict values.
+        """
+        # !TODO check the model is fitted
+        y_hat = self.predict(X)
+        # Classification
+        if self.objective == "classification":
+            score = np.mean(y != y_hat)
+        # Regression
+        else:
+            score = np.mean((y - y_hat) ** 2) / np.var(y)
+        return score
 
 # =============================================================================
 # Public estimators
@@ -108,8 +178,9 @@ class DecisionTreeClassifier(BaseDecisionTree):
         min_impurity_decrease=0.,
         min_impurity_split=0
     ):
+        objective = "classification"
         super().__init__(
-            objective="classification",
+            objective=objective,
             criterion=criterion,
             min_samples_split=min_samples_split,
             min_samples_leaf=min_samples_leaf,
@@ -117,12 +188,6 @@ class DecisionTreeClassifier(BaseDecisionTree):
             min_impurity_decrease=min_impurity_decrease,
             min_impurity_split=min_impurity_split
         )
-
-    def score(self, X, y):
-        # check isfitted
-        y_hat = self.predict(X)
-        score = np.mean(y != y_hat)
-        return score
 
 
 class DecisionTreeRegressor(BaseDecisionTree):
@@ -137,8 +202,9 @@ class DecisionTreeRegressor(BaseDecisionTree):
         min_impurity_decrease=0.,
         min_impurity_split=0
     ):
+        objective = "regression"
         super().__init__(
-            objective="regression",
+            objective=objective,
             criterion=criterion,
             min_samples_split=min_samples_split,
             min_samples_leaf=min_samples_leaf,
@@ -146,8 +212,3 @@ class DecisionTreeRegressor(BaseDecisionTree):
             min_impurity_decrease=min_impurity_decrease,
             min_impurity_split=min_impurity_split
         )
-
-    def score(self, X, y):
-        y_hat = self.predict(X)
-        score = np.mean((y - y_hat) ** 2)
-        return score
