@@ -180,8 +180,8 @@ class MSE(RegressionCriterion):
     def children_impurity(self):
         sq_sum_left = np.sum(self.y_left ** 2)
         sq_sum_right = np.sum(self.y_right ** 2)
-        mse_left = (sq_sum_left / self.n_left) - \
-            (self.sum_left / self.n_left) ** 2
-        mse_right = (sq_sum_right / self.n_right) - \
-            (self.sum_right / self.n_right) ** 2
+        mse_left = (sq_sum_left / self.n_left) - (self.sum_left / self.n_left) ** 2 \
+            if self.n_left > 0 else 0.0
+        mse_right = (sq_sum_right / self.n_right) - (self.sum_right / self.n_right) ** 2 \
+            if self.n_right > 0 else 0.0
         return mse_left, mse_right
