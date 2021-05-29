@@ -73,6 +73,7 @@ class BaseDecisionTree(object):
         return self
 
     def predict(self, X):
+        # check isfitted
         n_samples = X.shape[0]
         y_pred = []
         for i in range(n_samples):
@@ -88,9 +89,6 @@ class BaseDecisionTree(object):
         return np.array(y_pred)
 
     def score(self, X, y):
-        pass
-
-    def export(self):
         pass
 
 # =============================================================================
@@ -120,6 +118,12 @@ class DecisionTreeClassifier(BaseDecisionTree):
             min_impurity_split=min_impurity_split
         )
 
+    def score(self, X, y):
+        # check isfitted
+        y_hat = self.predict(X)
+        score = np.mean(y != y_hat)
+        return score
+
 
 class DecisionTreeRegressor(BaseDecisionTree):
     """A decision tree regressor."""
@@ -142,3 +146,8 @@ class DecisionTreeRegressor(BaseDecisionTree):
             min_impurity_decrease=min_impurity_decrease,
             min_impurity_split=min_impurity_split
         )
+
+    def score(self, X, y):
+        y_hat = self.predict(X)
+        score = np.mean((y - y_hat) ** 2)
+        return score
