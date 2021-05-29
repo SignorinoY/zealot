@@ -1,4 +1,5 @@
 from sklearn import datasets
+import numpy as np
 
 from tree.classes import DecisionTreeClassifier, DecisionTreeRegressor
 
@@ -8,12 +9,11 @@ iris = datasets.load_iris()
 X = iris.data
 y = iris.target
 
-clf = DecisionTreeClassifier(criterion="gini")
+clf = DecisionTreeClassifier(criterion="entropy")
 
 clf.fit(X, y)
-
-print(clf.tree_)
-print(clf.predict(X))
+y_hat = clf.predict(X)
+print(clf.score(X, y))
 
 # Regression
 
@@ -24,6 +24,5 @@ y = boston.target
 reg = DecisionTreeRegressor()
 
 reg.fit(X, y)
-
-print(reg.tree_)
-print(reg.predict(X))
+y_hat = reg.predict(X)
+print(reg.score(X, y))
