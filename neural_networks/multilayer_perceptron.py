@@ -1,4 +1,4 @@
-from .utils.functions import *
+from .functions import sigmoid
 
 
 class MultiLayerPerceptron(object):
